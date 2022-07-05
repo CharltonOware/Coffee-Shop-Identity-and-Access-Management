@@ -1,6 +1,6 @@
 import os
 import sys
-from flask import Flask, request, jsonify, abort
+from flask import Flask, request, jsonify, abort, flash
 from sqlalchemy import exc
 import json
 from flask_cors import CORS
@@ -9,6 +9,7 @@ from .database.models import db_drop_and_create_all, setup_db, Drink
 from .auth.auth import AuthError, requires_auth
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = os.urandom(12).hex()
 setup_db(app)
 CORS(app)
 
@@ -21,7 +22,6 @@ CORS(app)
 #db_drop_and_create_all()
 
 # ROUTES
-
 @app.route('/drinks')
 def get_drinks():
     drinks_query = Drink.query.all()
@@ -31,32 +31,46 @@ def get_drinks():
         return jsonify({
             "success": True,
             "drinks": drinks
-        })
+        }), 200
     except:
         print(sys.excinfo())
         abort(404)
 
+@app.route('/drinks-detail')
+@requires_auth('get:drinks-detail')
+def get_drinks_detail(payload):
+    print(payload)
+    drinks_query = Drink.query.all()
+    try:
+        drinks = [drink.long() for drink in drinks_query]
 
-'''
-@TODO implement endpoint
-    GET /drinks-detail
-        it should require the 'get:drinks-detail' permission
-        it should contain the drink.long() data representation
-    returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
-        or appropriate status code indicating reason for failure
-'''
+        return jsonify({
+            "success": True,
+            "drinks": drinks
+        }), 200
+    except:
+        print(sys.excinfo())
+        abort(404)
 
+@app.route('/drinks', methods=['POST'])
+@requires_auth('post:drinks')
+def create_drink(payload):
+    body = request.get_json()
+    new_title = body.get('title', None)
+    new_recipe = body.get('recipe', None)
 
-'''
-@TODO implement endpoint
-    POST /drinks
-        it should create a new row in the drinks table
-        it should require the 'post:drinks' permission
-        it should contain the drink.long() data representation
-    returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the newly created drink
-        or appropriate status code indicating reason for failure
-'''
+    try:
+        drink = Drink(title=new_title,recipe=json.dumps(new_recipe))
+        if Drink.query.filter_by(title=drink.title).count() < 1:
+            drink.insert()
 
+        return jsonify({
+            "success": True,
+            "drinks": [drink.long()]
+        }), 201
+    except:
+        print(sys.exc_info())
+        abort(422)
 
 '''
 @TODO implement endpoint
