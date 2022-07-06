@@ -21,7 +21,7 @@ def after_request(response):
     return response
 
 '''
-@TODO uncomment the following line to initialize the datbase
+Uncomment the following line to initialize the datbase
 !! NOTE THIS WILL DROP ALL RECORDS AND START YOUR DB FROM SCRATCH
 !! NOTE THIS MUST BE UNCOMMENTED ON FIRST RUN
 !! Running this funciton will add one
@@ -102,16 +102,6 @@ def update_drink(payload,id):
         print(traceback.print_exception(etype, value, tb))
         abort(422)
 
-'''
-@TODO implement endpoint
-    DELETE /drinks/<id>
-        where <id> is the existing model id
-        it should respond with a 404 error if <id> is not found
-        it should delete the corresponding row for <id>
-        it should require the 'delete:drinks' permission
-    returns status code 200 and json {"success": True, "delete": id} where id is the id of the deleted record
-        or appropriate status code indicating reason for failure
-'''
 @app.route('/drinks/<int:id>', methods=['DELETE','GET'])
 @requires_auth('delete:drinks')
 def delete_drink(payload,id):
@@ -156,7 +146,13 @@ def unprocessable(error):
                     }), 404
 
 '''
-
+@app.errorhandler(404)
+def not_found(error):
+    return jsonify({
+        "success": False,
+        "error": 404,
+        "message": "resource not found"
+    }), 404
 '''
 @TODO implement error handler for 404
     error handler should conform to general task above
