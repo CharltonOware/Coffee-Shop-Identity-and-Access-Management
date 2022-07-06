@@ -1,5 +1,5 @@
 import os
-import sys
+import sys, traceback
 from flask import Flask, request, jsonify, abort, flash
 from sqlalchemy import exc
 import json
@@ -27,13 +27,13 @@ def get_drinks():
     drinks_query = Drink.query.all()
     try:
         drinks = [drink.short() for drink in drinks_query]
-
         return jsonify({
             "success": True,
             "drinks": drinks
         }), 200
     except:
-        print(sys.excinfo())
+        etype, value, tb = sys.exc_info()
+        print(traceback.print_exception(etype, value, tb))
         abort(404)
 
 @app.route('/drinks-detail')
@@ -49,7 +49,8 @@ def get_drinks_detail(payload):
             "drinks": drinks
         }), 200
     except:
-        print(sys.excinfo())
+        etype, value, tb = sys.exc_info()
+        print(traceback.print_exception(etype, value, tb))
         abort(404)
 
 @app.route('/drinks', methods=['POST'])
@@ -66,10 +67,11 @@ def create_drink(payload):
 
         return jsonify({
             "success": True,
-            "drinks": [drink.long()]
-        }), 201
+            "drinks": json.dumps([drink.long()])
+        }), 200
     except:
-        print(sys.exc_info())
+        etype, value, tb = sys.exc_info()
+        print(traceback.print_exception(etype, value, tb))
         abort(422)
 
 '''
@@ -83,7 +85,26 @@ def create_drink(payload):
     returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the updated drink
         or appropriate status code indicating reason for failure
 '''
+@app.route('/drinks/<int:id>',methods=['PATCH'])
+@requires_auth('patch:drinks')
+def update_drink(payload,id):
+    body = request.get_json()
+    try:
+        drink = Drink.query.filter(Drink.id == id).one_or_none()
+        if drink is None:
+            abort(404)
+        drink.title = body.get('title')
+        #drink.recipe = body.get('recipe')
+        drink.update()
 
+        return jsonify({
+            "success": True,
+            "drinks": [drink.long()]
+        })
+    except:
+        etype, value, tb = sys.exc_info()
+        print(traceback.print_exception(etype, value, tb))
+        abort(422)
 
 '''
 @TODO implement endpoint
