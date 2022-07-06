@@ -1,6 +1,6 @@
 import os
 import sys, traceback
-from flask import Flask, request, jsonify, abort, flash
+from flask import Flask, request, jsonify, abort
 from sqlalchemy import exc
 import json
 from flask_cors import CORS
@@ -11,7 +11,14 @@ from .auth.auth import AuthError, requires_auth
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(12).hex()
 setup_db(app)
-CORS(app)
+CORS(app, resources={r"/*":{"origins":"*"}})
+
+@app.after_request
+def after_request(response):
+    response.headers.add("Access-Control-Allow-Headers","Content-Type,Authorization,true")
+    response.headers.add("Access-Control-Allow-Methods","GET,POST,PATCH,DELETE,OPTIONS")
+    response.headers.add("Access-Control-Allow-Credentials","true")
+    return response
 
 '''
 @TODO uncomment the following line to initialize the datbase
@@ -74,17 +81,6 @@ def create_drink(payload):
         print(traceback.print_exception(etype, value, tb))
         abort(422)
 
-'''
-@TODO implement endpoint
-    PATCH /drinks/<id>
-        where <id> is the existing model id
-        it should respond with a 404 error if <id> is not found
-        it should update the corresponding row for <id>
-        it should require the 'patch:drinks' permission
-        it should contain the drink.long() data representation
-    returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the updated drink
-        or appropriate status code indicating reason for failure
-'''
 @app.route('/drinks/<int:id>',methods=['PATCH'])
 @requires_auth('patch:drinks')
 def update_drink(payload,id):
@@ -116,7 +112,24 @@ def update_drink(payload,id):
     returns status code 200 and json {"success": True, "delete": id} where id is the id of the deleted record
         or appropriate status code indicating reason for failure
 '''
-
+@app.route('/drinks/<int:id>', methods=['DELETE','GET'])
+@requires_auth('delete:drinks')
+def delete_drink(payload,id):
+    print(payload)
+    drink = Drink.query.filter(Drink.id == id).one_or_none()
+    print(drink)
+    if drink is None:
+        abort(404)
+    try:
+        drink.delete()
+        return jsonify({
+            "success": True,
+            "delete": id
+        }), 200
+    except:
+        etype, value, tb = sys.exc_info()
+        print(traceback.print_exception(etype, value, tb))
+        abort(422)
 
 # Error Handling
 '''
