@@ -1,30 +1,33 @@
-# Coffee Shop Full Stack
+# Coffee Shop Full Stack app
 
-## Full Stack Nano - IAM Final Project
+## Description
 
-Udacity has decided to open a new digitally enabled cafe for students to order drinks, socialize, and study hard. But they need help setting up their menu experience.
+Coffee shop is a drink menu web application for a digital cafe and has the user experience features below:
 
-You have been called on to demonstrate your newly learned skills to create a full stack drink menu application. The application must:
+1. Displays graphics representing the ratios of ingredients in each drink.
+2. Allows public users to view drink names and graphics.
+3. Allows the shop baristas to see the recipe information.
+4. Allows the shop managers to create new drinks and edit existing drinks.
 
-1. Display graphics representing the ratios of ingredients in each drink.
-2. Allow public users to view drink names and graphics.
-3. Allow the shop baristas to see the recipe information.
-4. Allow the shop managers to create new drinks and edit existing drinks.
+As a developer, completing this app enables me to showcase my ability to implement a well structured API that performs authentication and authorization of users accessing the various resources.
 
-## Tasks
+This project is completed as a requirement for my Udacity full-stack web developer nanodegree, specifically for the class 'Identification and Access Management'.
 
-There are `@TODO` comments throughout the project. We recommend tackling the sections in order. Start by reading the READMEs in:
+## Technologies
 
-1. [`./backend/`](./backend/README.md)
-2. [`./frontend/`](./frontend/README.md)
+Flask <br>
+Angular <br>
+Postman <br>
+SQLAlchemy <br>
+Auth0
 
 ## About the Stack
 
-We started the full stack application for you. It is designed with some key functional areas:
+The full stack application is designed with standalone backend and frontend applications.
 
 ### Backend
 
-The `./backend` directory contains a partially completed Flask server with a pre-written SQLAlchemy module to simplify your data needs. You will need to complete the required endpoints, configure, and integrate Auth0 for authentication.
+The `./backend` directory contains a completed Flask server, an SQLAlchemy module to simplify your data needs, and a unit test file.
 
 [View the README.md within ./backend for more details.](./backend/README.md)
 
@@ -33,3 +36,13 @@ The `./backend` directory contains a partially completed Flask server with a pre
 The `./frontend` directory contains a complete Ionic frontend to consume the data from the Flask server. You will only need to update the environment variables found within (./frontend/src/environment/environment.ts) to reflect the Auth0 configuration details set up for the backend app.
 
 [View the README.md within ./frontend for more details.](./frontend/README.md)
+
+## Todo
+Include API references
+
+## Authors Info
+
+Charlton Omondi, @udacity/active-public-content
+
+## Acknowledgements
+Gabriel Ruttner (Udacity instructor - Identity and Access Management)
